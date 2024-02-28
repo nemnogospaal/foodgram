@@ -17,6 +17,7 @@ class UserAdmin(admin.ModelAdmin):
         'username'
     )
 
+
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     list_display = (

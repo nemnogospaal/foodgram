@@ -3,9 +3,9 @@ from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
 from users.models import Follow
-from users.validators import USERNAME_SYMBOLS_REGEX
 
 User = get_user_model()
+
 
 class CreateUserSerializer(UserCreateSerializer):
     """Сериализатор пользователя."""
@@ -21,6 +21,7 @@ class CreateUserSerializer(UserCreateSerializer):
             'last_name')
         extra_kwargs = {'password': {'write_only': True}}
 
+
 class CustomUserSerializer(serializers.ModelSerializer):
     """Кастомный сериализатор пользователя."""
 
@@ -34,14 +35,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'username',
             'first_name',
             'last_name',
-            'is_subscribed')
-    
+            'is_subscribed'
+        )
+
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
         return Follow.objects.filter(user=request.user).exists()
-
-        
-

@@ -29,10 +29,11 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ['username']
-    
+
     def __str__(self):
         return self.username
-    
+
+
 class Follow(models.Model):
     user = models.ForeignKey(
         User,
@@ -53,8 +54,7 @@ class Follow(models.Model):
                 fields=['user', 'author'],
                 name='user_following')]
         verbose_name = 'Подписки'
-        verbose_name_plural = 'Подписки'    
+        verbose_name_plural = 'Подписки'
 
     def __str__(self):
         return f'{self.user} {self.author}'
-

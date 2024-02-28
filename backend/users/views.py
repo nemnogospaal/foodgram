@@ -8,10 +8,11 @@ from rest_framework.response import Response
 
 from api.pagination import LimitPagePagination
 from recipes.serializers import FollowSerializer
-from users.models import Follow, User
+from users.models import Follow
 from users.serializers import CustomUserSerializer
 
 User = get_user_model()
+
 
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
@@ -20,19 +21,18 @@ class UserViewSet(UserViewSet):
     pagination_class = LimitPagePagination
     search_fields = ('username', 'email')
 
-
     @action(
         detail=False,
         methods=['GET'],
-        permission_classes = (IsAuthenticated,)
+        permission_classes=(IsAuthenticated,)
     )
     def me(self, request):
         return super().me(request)
 
     @action(
-            detail=False,
-            methods=['GET'],
-            permission_classes=(IsAuthenticated,)
+        detail=False,
+        methods=['GET'],
+        permission_classes=(IsAuthenticated,)
     )
     def subscriptions(self, request):
         queryset = User.objects.filter(follow__user=request.user)
@@ -43,9 +43,9 @@ class UserViewSet(UserViewSet):
         return self.get_paginated_response(serializer.data)
 
     @action(
-            detail=True,
-            methods=['POST', 'DELETE'],
-            permission_classes=(IsAuthenticated,)
+        detail=True,
+        methods=['POST', 'DELETE'],
+        permission_classes=(IsAuthenticated,)
     )
     def subscribe(self, request, **kwargs):
         author_id = self.kwargs.get('id')
@@ -53,8 +53,8 @@ class UserViewSet(UserViewSet):
         if request.method == 'POST':
 
             serializer = FollowSerializer(author,
-                data=request.data,
-                context={'request': request})
+                                          data=request.data,
+                                          context={'request': request})
             serializer.is_valid(raise_exception=True)
             Follow.objects.create(user=request.user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -66,4 +66,3 @@ class UserViewSet(UserViewSet):
         subscribe.delete()
         return Response('Вы успешно отписались',
                         status=status.HTTP_204_NO_CONTENT)
-

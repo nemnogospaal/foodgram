@@ -27,38 +27,37 @@ class RecipeViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-    
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipeSerializer
         return PostRecipeSerializer
-    
+
     def post_delete_recipe(self, request, pk, related_model):
-        recipe = get_object_or_404(Recipe, pk=pk)
+        recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            if not related_model.objects.filter(
+            if related_model.objects.filter(
                 user=self.request.user,
                 recipe=recipe).exists():
-                related_model.objects.create(user=self.request.user,
-                                             recipe=recipe)
-                serializer = FollowRecipeSerializer(recipe)
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+                return Response('Подписка уже оформлена',
+                                status=status.HTTP_400_BAD_REQUEST)
+            related_model.objects.create(user=self.request.user,
+                                         recipe=recipe)
+            serializer = FollowRecipeSerializer(recipe)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+
         if request.method == 'DELETE':
             if related_model.objects.filter(
                 user=self.request.user,
                 recipe=recipe
                 ).exists():
-                related_model.objects.filter(
-                    user=self.request.user,
-                    recipe=recipe
-                ).delete()
-                return Response('Рецепт удалён из избранных', status=status.HTTP_204_NO_CONTENT)
+                    related_model.objects.filter(
+                        user=self.request.user,
+                        recipe=recipe).delete()
+                    return Response('Рецепт удалён из избранных', status=status.HTTP_204_NO_CONTENT)
             return Response('Такого рецепта нет', status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response('Непонятно', status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     @action(
             detail=True,
             methods=['POST', 'DELETE'],
@@ -102,7 +101,3 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
     queryset = Tag.objects.all()
     serializer_class = TagSerialzier
-
-
-
-
