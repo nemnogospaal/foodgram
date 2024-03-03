@@ -92,6 +92,19 @@ class RecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get('request')
+        if request is not None:
+            if (
+                'image' in representation
+                and instance.image
+                and instance.image.url
+            ):
+                representation['image'] = instance.image.url
+        return representation
+
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user.id
