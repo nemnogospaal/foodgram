@@ -8,7 +8,7 @@ class User(AbstractUser):
     username = models.CharField(
         max_length=150,
         verbose_name='Имя пользователя',
-        validators=[USERNAME_SYMBOLS_REGEX,],
+        validators=[USERNAME_SYMBOLS_REGEX],
         unique=True
     )
     email = models.EmailField(
