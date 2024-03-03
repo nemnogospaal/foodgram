@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -8,11 +7,11 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-ry3@$c@5x%!o2c1l2m6(mkhw0%je2p4rik6umpc6!9o@nzxu6t' # os.getenv('SECRET_KEY', 'django-secret-key')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-secret-key')
 
-DEBUG = True # os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', 'nemnogofoodgram.ddns.net'] # os.getenv('ALLOWED_HOSTS', 'localhost').split()
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -73,13 +72,6 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 
 AUTH_USER_MODEL = 'users.User'
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,11 +112,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-       'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.AllowAny',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication', #rest_framework_simplejwt.authentication.JWTAuthentication
+        'rest_framework.authentication.TokenAuthentication',
     ],
 
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.LimitPagePagination',
@@ -139,10 +131,11 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create': 'users.serializers.CreateUserSerializer',
         'user': 'users.serializers.CustomUserSerializer',
-        'current_user': 'users.serializers.CustomUserSerializer'
+        'current_user': 'users.serializers.CustomUserSerializer',
+        'user_list': 'users.serializers.CustomUserSerializer',
     },
     'PERMISSIONS': {
         'user': ['api.permissions.AuthorOrReadOnly'],
-        'user_list':['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
     }
 }

@@ -1,8 +1,9 @@
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen.canvas import Canvas
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen.canvas import Canvas
+
 
 def create_pdf(ingredients):
 
@@ -16,7 +17,7 @@ def create_pdf(ingredients):
     for ingredient in ingredients:
         canvas.drawString(
             x,
-            y-30,
+            y - 30,
             f'{ingredient["ingredient__name"]} - '
             f'{ingredient["amount"]} '
             f'{ingredient["ingredient__measurement_unit"]}'

@@ -1,5 +1,5 @@
 from colorfield.fields import ColorField
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import User
@@ -20,21 +20,22 @@ class Ingredient(models.Model):
 
     class Meta:
         ordering = ['-id']
-        verbose_name='Ингредиент'
-        verbose_name_plural='Ингредиенты'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
         constraints = [
             models.UniqueConstraint(
                 fields=('name', 'measurement_unit'),
                 name='unique_name_measurement_unit'
             )
         ]
-    
+
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
 
 
 class Tag(models.Model):
     """Модель тега."""
+
     name = models.CharField(
         max_length=200,
         verbose_name='Название тега'
@@ -47,16 +48,17 @@ class Tag(models.Model):
         max_length=200,
         verbose_name='Слаг'
     )
-    
+
     class Meta:
-        verbose_name='Тег'
-        verbose_name_plural='Теги'
-    
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
     def __str__(self):
         return self.name
 
+
 class Recipe(models.Model):
-    """Модель избранного рецепта."""
+    """Модель рецепта."""
 
     author = models.ForeignKey(
         User,
@@ -102,9 +104,9 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
-
     def __str__(self):
         return self.name
+
 
 class Favorite(models.Model):
     """Модель избранного рецепта."""
@@ -132,10 +134,8 @@ class Favorite(models.Model):
             )
         ]
 
-
     def __str__(self):
         return f'{self.user} {self.recipe}'
-
 
 
 class ShoppingCart(models.Model):
@@ -187,13 +187,13 @@ class IngredientAmount(models.Model):
         verbose_name='Количество',
         validators=[
             MinValueValidator(1, 'Необходимо количество больше единицы')
-            ]
-        )
+        ]
+    )
 
     class Meta:
         verbose_name = 'Количество ингредиентов'
         verbose_name_plural = 'Количество ингредиентов'
         ordering = ['-id']
-    
+
     def __str__(self):
         return f'{self.recipe} {self.ingredient}'

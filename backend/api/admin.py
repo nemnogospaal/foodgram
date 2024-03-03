@@ -22,6 +22,7 @@ class RecipeAdmin(admin.ModelAdmin):
     def favorite_recipes_count(self, obj):
         return obj.in_favorite.count()
 
+
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = (
@@ -31,9 +32,10 @@ class IngredientAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
 
+
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display= (
+    list_display = (
         'id',
         'user',
         'recipe'
@@ -43,6 +45,7 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         'user__email',
         'recipe__name'
     )
+
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
@@ -57,6 +60,7 @@ class FavoriteAdmin(admin.ModelAdmin):
         'recipe__name'
     )
 
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
@@ -67,5 +71,5 @@ class TagAdmin(admin.ModelAdmin):
     )
     search_fields = ('name', 'color', 'slug')
 
-admin.site.register(IngredientAmount)
 
+admin.site.register(IngredientAmount)
