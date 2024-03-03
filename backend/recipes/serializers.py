@@ -2,11 +2,11 @@ from django.core.validators import MinValueValidator
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
+from users.models import Follow
+from users.serializers import CustomUserSerializer
 
 from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
-from users.models import Follow
-from users.serializers import CustomUserSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -92,7 +92,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
-    
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         request = self.context.get('request')
@@ -104,7 +104,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             ):
                 representation['image'] = instance.image.url
         return representation
-
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user.id
