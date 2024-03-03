@@ -16,10 +16,10 @@ services:
     restart: always
 
   backend:
+    build: ../backend
     container_name: backend
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+      #context: ../backend
+      #dockerfile: Dockerfile
     env_file: ../.env
     volumes:
       - static:/backend_static/
@@ -29,10 +29,11 @@ services:
     restart: always
 
   frontend:
+    #image: nemnogospaal/foodgram_frontend
     container_name: frontend
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    build: ../frontend
+      #context: ../frontend
+      #dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 
