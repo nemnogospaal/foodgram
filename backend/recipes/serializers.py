@@ -1,12 +1,11 @@
-from django.core.validators import MinValueValidator
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from users.models import Follow
-from users.serializers import CustomUserSerializer
 
-from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                            ShoppingCart, Tag)
+from recipes.models import (Favorite, Ingredient, IngredientAmount,
+                            Recipe, Tag)
+from users.serializers import CustomUserSerializer
+from backend.settings import MAX_VALUE, MIN_VALUE
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -37,6 +36,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
+    amount = serializers.IntegerField(max_value=MAX_VALUE, min_value=MIN_VALUE)
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
 
     class Meta:
@@ -108,14 +108,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         user = self.context['request'].user.id
         recipe = obj.id
-        return Favorite.objects.filter(user_id=user,
-                                       recipe_id=recipe).exists()
+        return obj.in_favorite.all().filter(user_id=user,
+                                            recipe_id=recipe).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user.id
         recipe = obj.id
-        return ShoppingCart.objects.filter(user_id=user,
-                                           recipe_id=recipe).exists()
+        return obj.shopping_cart.all().filter(user_id=user,
+                                              recipe_id=recipe).exists()
 
 
 class PostRecipeSerializer(serializers.ModelSerializer):
@@ -128,11 +128,8 @@ class PostRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True)
     cooking_time = serializers.IntegerField(
         required=True,
-        validators=[
-            MinValueValidator(
-                1,
-                'Время приготовления должно быть больше одной минуты')
-        ])
+        max_value=MAX_VALUE,
+        min_value=MIN_VALUE)
 
     class Meta:
         model = Recipe
@@ -245,7 +242,8 @@ class FollowSerializer(CustomUserSerializer):
     def validate(self, data):
         author = self.instance
         user = self.context.get('request').user
-        if Follow.objects.filter(author=author, user=user).exists():
+        if self.instance.follow.all().filter(author=author, user=user
+                                             ).exists():
             raise ValidationError(
                 'Подписка уже оформлена'
             )
@@ -258,12 +256,12 @@ class FollowSerializer(CustomUserSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
-        recipes = Recipe.objects.filter(author=obj)
+        recipes = obj.recipes.all().filter(author=obj)
         if recipes_limit:
-            recipes = Recipe.objects.filter(
+            recipes = obj.recipes.all().filter(
                 author=obj).order_by('-id')[:int(recipes_limit)]
         serializer = FavoriteRecipeSerializer(recipes, many=True)
         return serializer.data
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return obj.recipes.all().filter(author=obj).count()

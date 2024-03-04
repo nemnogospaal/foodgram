@@ -55,6 +55,7 @@ class Follow(models.Model):
                 name='user_following')]
         verbose_name = 'Подписки'
         verbose_name_plural = 'Подписки'
+        ordering = ['-id']
 
     def __str__(self):
         return f'{self.user} {self.author}'

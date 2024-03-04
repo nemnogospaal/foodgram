@@ -1,7 +1,9 @@
 from colorfield.fields import ColorField
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+
 from users.models import User
+from backend.settings import MIN_VALUE, MAX_VALUE
 
 
 class Ingredient(models.Model):
@@ -51,6 +53,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -88,10 +91,11 @@ class Recipe(models.Model):
         related_name='tags',
         verbose_name='Теги'
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         default=1,
         verbose_name='Время приготовления',
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(MIN_VALUE),
+                    MaxValueValidator(MAX_VALUE)]
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -126,6 +130,7 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        ordering = ['-id']
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
@@ -156,6 +161,7 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Корзина покупок'
         verbose_name_plural = 'Корзина покупок'
+        ordering = ['-id']
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'user'],
@@ -185,7 +191,10 @@ class IngredientAmount(models.Model):
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
         validators=[
-            MinValueValidator(1, 'Необходимо количество больше единицы')
+            MinValueValidator(MIN_VALUE,
+                              'Необходимо количество больше единицы'),
+            MaxValueValidator(MAX_VALUE,
+                              'Слишком большое количество')
         ]
     )
 

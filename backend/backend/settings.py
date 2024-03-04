@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+MIN_VALUE = 1
+MAX_VALUE = 32000
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-secret-key')

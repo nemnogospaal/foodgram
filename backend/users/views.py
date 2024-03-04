@@ -1,13 +1,13 @@
-from api.pagination import LimitPagePagination
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.serializers import FollowSerializer
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from api.pagination import LimitPagePagination
+from recipes.serializers import FollowSerializer
 from users.models import Follow
 from users.serializers import CustomUserSerializer
 
@@ -59,7 +59,8 @@ class UserViewSet(UserViewSet):
             Follow.objects.create(user=request.user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        subscribe = Follow.objects.filter(user=request.user, author=author)
+        subscribe = request.user.follower.filter(
+            user=request.user, author=author)
         if not subscribe.exists():
             return Response('Вы не подписаны на этого пользователя',
                             status=status.HTTP_400_BAD_REQUEST)
