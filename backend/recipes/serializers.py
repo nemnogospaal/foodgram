@@ -1,11 +1,10 @@
+from django.conf import settings
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
-from recipes.models import (Favorite, Ingredient, IngredientAmount,
-                            Recipe, Tag)
+from recipes.models import Favorite, Ingredient, IngredientAmount, Recipe, Tag
 from users.serializers import CustomUserSerializer
-from backend.settings import MAX_VALUE, MIN_VALUE
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -36,7 +35,8 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
-    amount = serializers.IntegerField(max_value=MAX_VALUE, min_value=MIN_VALUE)
+    amount = serializers.IntegerField(max_value=settings.MAX_VALUE,
+                                      min_value=settings.MIN_VALUE)
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
 
     class Meta:
@@ -95,7 +95,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        request = self.context.get('request')
+        request = self.context['request']
         if request is not None:
             if (
                 'image' in representation
@@ -128,8 +128,8 @@ class PostRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True)
     cooking_time = serializers.IntegerField(
         required=True,
-        max_value=MAX_VALUE,
-        min_value=MIN_VALUE)
+        max_value=settings.MAX_VALUE,
+        min_value=settings.MIN_VALUE)
 
     class Meta:
         model = Recipe
@@ -148,7 +148,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         return RecipeSerializer(
             instance,
             context={
-                'request': self.context.get('request')
+                'request': self.context['request']
             }
         ).data
 
@@ -241,7 +241,7 @@ class FollowSerializer(CustomUserSerializer):
 
     def validate(self, data):
         author = self.instance
-        user = self.context.get('request').user
+        user = self.context['request'].user
         if self.instance.follow.all().filter(author=author, user=user
                                              ).exists():
             raise ValidationError(
@@ -254,7 +254,7 @@ class FollowSerializer(CustomUserSerializer):
         return data
 
     def get_recipes(self, obj):
-        request = self.context.get('request')
+        request = self.context['request']
         recipes_limit = request.GET.get('recipes_limit')
         recipes = obj.recipes.all().filter(author=obj)
         if recipes_limit:
