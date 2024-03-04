@@ -5,8 +5,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 
 FONT_SIZE = 14
-X_POS = 10
-Y_POS = 700
+X_POS = 170
+Y_POS = 400
 INDENTATION = 30
 
 
